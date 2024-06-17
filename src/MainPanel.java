@@ -19,7 +19,7 @@ public class MainPanel extends JPanel {
         LoginPanel loginPanel = new LoginPanel(this, userManager);
         RegisterPanel registerPanel = new RegisterPanel(this, userManager);
         DifficultyPanel difficultyPanel = new DifficultyPanel(this);
-        GamePanel gamePanel = new GamePanel(this);  // Pass the MainPanel reference here
+        GamePanel gamePanel = new GamePanel(this);
 
         cardPanel.add(startPanel, "START");
         cardPanel.add(loginPanel, "LOGIN");
@@ -31,6 +31,23 @@ public class MainPanel extends JPanel {
         add(cardPanel, BorderLayout.CENTER);
 
         cardLayout.show(cardPanel, "START");
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        int width = getWidth();
+        int height = getHeight();
+
+        // Create the gradient paint
+        Color startColor = Color.decode("#7AD2EA");
+        Color endColor = Color.decode("#0F597E");
+        GradientPaint gp = new GradientPaint(0, 0, startColor, 0, height, endColor);
+
+        // Paint the background with the gradient
+        g2d.setPaint(gp);
+        g2d.fillRect(0, 0, width, height);
     }
 
     public void showStartPanel() {
