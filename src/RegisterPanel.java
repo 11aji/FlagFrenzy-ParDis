@@ -13,6 +13,7 @@ public class RegisterPanel extends JPanel {
     private UserManager userManager;
     private MainPanel mainPanel;
 
+
     public RegisterPanel(MainPanel mainPanel, UserManager userManager) {
         this.mainPanel = mainPanel;
         this.userManager = userManager;
@@ -58,6 +59,7 @@ public class RegisterPanel extends JPanel {
 
         // Add Username field
         gbc.gridx = 1;
+
         usernameField = new JTextField(15);
         usernameField.setText("Username");
         usernameFieldFocus(usernameField);
@@ -138,27 +140,27 @@ public class RegisterPanel extends JPanel {
     }
 
     private void usernameFieldFocus(JTextField field) {
-            usernameField.setText("Username");
-            usernameField.setHorizontalAlignment(JTextField.CENTER);
-            usernameField.setForeground(Color.decode("#0F597E"));
+        usernameField.setText("Username");
+        usernameField.setHorizontalAlignment(JTextField.CENTER);
+        usernameField.setForeground(Color.decode("#0F597E"));
 
-            field.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    if (field.getText().equals("Username")) {
-                        field.setText("");
-                        field.setForeground(Color.decode("#0F597E"));
-                    }
+        field.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (field.getText().equals("Username")) {
+                    field.setText("");
+                    field.setForeground(Color.decode("#0F597E"));
                 }
+            }
 
-                @Override
-                public void focusLost(FocusEvent e) {
-                    if (field.getText().equals("")) {
-                        field.setText("Username");
-                        field.setForeground(Color.decode("#0F597E"));
-                    }
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (field.getText().equals("")) {
+                    field.setText("Username");
+                    field.setForeground(Color.decode("#0F597E"));
                 }
-            });
+            }
+        });
     }
 
 
@@ -210,6 +212,9 @@ public class RegisterPanel extends JPanel {
 
         if (userManager.registerUser(username)) {
             JOptionPane.showMessageDialog(this, "User registered successfully. Please login.", "Registration Successful", JOptionPane.INFORMATION_MESSAGE);
+            mainPanel.showStartPanel();
+        } else if (usernameField.equals("")) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid username!");
         } else {
             JOptionPane.showMessageDialog(this, "Username or email already exists. Please choose another.", "Registration Failed", JOptionPane.ERROR_MESSAGE);
         }
