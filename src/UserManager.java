@@ -11,17 +11,21 @@ public class UserManager {
         loadUsers();
     }
 
-    public boolean registerUser(String username) {
+    public boolean registerUser(String username, String password) {
         if (users.containsKey(username)) {
             return false;
         }
-        users.put(username, new User(username));
+        users.put(username, new User(username, password));
         saveUsers();
         return true;
     }
 
-    public User loginUser(String username) {
-        return users.get(username);
+    public User loginUser(String username, String password) {
+        User user = users.get(username);
+        if (user != null && user.getPassword().equals(password)) {
+            return user;
+        }
+        return null;
     }
 
     private void saveUsers() {

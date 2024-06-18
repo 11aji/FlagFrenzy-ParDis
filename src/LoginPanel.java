@@ -8,6 +8,7 @@ import java.awt.event.FocusEvent;
 
 public class LoginPanel extends JPanel {
     private JTextField usernameField;
+    private JPasswordField passwordField;
     private JButton loginButton;
     private JButton backButton;
     private UserManager userManager;
@@ -54,22 +55,30 @@ public class LoginPanel extends JPanel {
         gbc.gridy++;
 
         gbc.gridx = 1;
-        usernameField = new JTextField(15);
+        usernameField = new RoundedTextField(15);
         usernameField.setText("Username");
         usernameFieldFocus(usernameField);
         styleTextField(usernameField);
         formPanel.add(usernameField, gbc);
 
+        gbc.gridy++;
+
+        gbc.gridx = 1;
+        passwordField = new RoundedPasswordField(15);
+        passwordFieldFocus(passwordField);
+        styleTextField(passwordField);
+        formPanel.add(passwordField, gbc);
+
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
 
-        loginButton = createRoundedButton("Login");
+        loginButton = createRoundedButton("LOG IN");
         formPanel.add(loginButton, gbc);
 
         gbc.gridy++;
 
-        backButton = createRoundedButton("Back");
+        backButton = createRoundedButton("BACK");
         formPanel.add(backButton, gbc);
 
         loginButton.addActionListener(new ActionListener() {
@@ -120,8 +129,10 @@ public class LoginPanel extends JPanel {
 
     private void styleTextField(JTextField textField) {
         textField.setFont(new Font("Arial", Font.PLAIN, 14));
+        textField.setForeground(Color.WHITE);
+        textField.setBackground(Color.decode("#2592AF"));
         textField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+                BorderFactory.createLineBorder(Color.decode("#2592AF"), 1),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         textField.setPreferredSize(new Dimension(200, 30));
     }
@@ -129,14 +140,14 @@ public class LoginPanel extends JPanel {
     private void usernameFieldFocus(JTextField field) {
         usernameField.setText("Username");
         usernameField.setHorizontalAlignment(JTextField.CENTER);
-        usernameField.setForeground(Color.decode("#0F597E"));
+        usernameField.setForeground(Color.WHITE);
 
         field.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 if (field.getText().equals("Username")) {
                     field.setText("");
-                    field.setForeground(Color.decode("#0F597E"));
+                    field.setForeground(Color.WHITE);
                 }
             }
 
@@ -144,7 +155,31 @@ public class LoginPanel extends JPanel {
             public void focusLost(FocusEvent e) {
                 if (field.getText().equals("")) {
                     field.setText("Username");
-                    field.setForeground(Color.decode("#0F5973"));
+                    field.setForeground(Color.WHITE);
+                }
+            }
+        });
+    }
+
+    private void passwordFieldFocus(JPasswordField field) {
+        passwordField.setText("Password");
+        passwordField.setHorizontalAlignment(JTextField.CENTER);
+        passwordField.setForeground(Color.WHITE);
+
+        field.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (String.valueOf(field.getPassword()).equals("Password")) {
+                    field.setText("");
+                    field.setForeground(Color.WHITE);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (String.valueOf(field.getPassword()).equals("")) {
+                    field.setText("Password");
+                    field.setForeground(Color.WHITE);
                 }
             }
         });
@@ -157,12 +192,9 @@ public class LoginPanel extends JPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Paint the rounded background
                 g2.setColor(getBackground());
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
 
-
-                // Paint the text
                 super.paintComponent(g2);
 
                 g2.dispose();
@@ -187,14 +219,21 @@ public class LoginPanel extends JPanel {
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setPreferredSize(new Dimension(120, 30));
-        button.setOpaque(false); // Make button non-opaque
+        button.setOpaque(false);
         button.setBorder(new RoundedBorder(15));
         return button;
     }
 
     private void loginUser() {
         String username = usernameField.getText().trim();
-        User user = userManager.loginUser(username);
+        String password = new String(passwordField.getPassword()).trim();
+        User user = userManager.loginUser(username, password);
+
+        if (username.isEmpty() || username.equals("Username")) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid username!", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         if (user != null) {
             mainPanel.setCurrentUser(user);
             mainPanel.showDifficultyPanel();
@@ -208,7 +247,7 @@ public class LoginPanel extends JPanel {
 
         RoundedBorder(int radius) { this.radius = radius; }
 
-        public Insets getBorderInsets(Component c ) {
+        public Insets getBorderInsets(Component c) {
             return new Insets(this.radius + 1, this.radius + 1, this.radius + 2, this.radius);
         }
 
@@ -216,6 +255,72 @@ public class LoginPanel extends JPanel {
 
         public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
             g.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
+        }
+    }
+
+    class RoundedTextField extends JTextField {
+        public RoundedTextField(int columns) {
+            super(columns);
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+
+            super.paintComponent(g2);
+            g2.dispose();
+        }
+
+        @Override
+        protected void paintBorder(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getForeground());
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 15, 15);
+            g2.dispose();
+        }
+
+        @Override
+        public void setBorder(Border border) {
+            // No border
+        }
+    }
+
+    class RoundedPasswordField extends JPasswordField {
+        public RoundedPasswordField(int columns) {
+            super(columns);
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+
+            super.paintComponent(g2);
+            g2.dispose();
+        }
+
+        @Override
+        protected void paintBorder(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getForeground());
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 15, 15);
+            g2.dispose();
+        }
+
+        @Override
+        public void setBorder(Border border) {
+            // No border
         }
     }
 }

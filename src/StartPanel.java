@@ -49,21 +49,27 @@ public class StartPanel extends JPanel {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+                // Calculate text bounds
+                FontMetrics fm = g2d.getFontMetrics();
+                Rectangle textBounds = fm.getStringBounds(getText(), g2d).getBounds();
+                int x = (getWidth() - textBounds.width) / 2;
+                int y = (getHeight() - textBounds.height) / 2 + fm.getAscent();
+
                 // Draw the outline
                 g2d.setFont(getFont());
-                g2d.setColor(Color.WHITE);
-                g2d.drawString(getText(), 1, getFont().getSize() + 1);
-                g2d.drawString(getText(), -1, getFont().getSize() - 1);
-                g2d.drawString(getText(), 1, getFont().getSize() - 1);
-                g2d.drawString(getText(), -1, getFont().getSize() + 1);
+                g2d.setColor(Color.BLACK);
+                g2d.drawString(getText(), x + 1, y + 1);
+                g2d.drawString(getText(), x - 1, y - 1);
+                g2d.drawString(getText(), x + 1, y - 1);
+                g2d.drawString(getText(), x - 1, y + 1);
 
                 // Draw the text
                 g2d.setColor(getForeground());
-                super.paintComponent(g2d);
+                g2d.drawString(getText(), x, y);
             }
         };
         titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
-        titleLabel.setForeground(Color.BLACK);
+        titleLabel.setForeground(Color.WHITE);
         gbc.gridy = 0;
         gradientPanel.add(titleLabel, gbc);
 
