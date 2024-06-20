@@ -62,6 +62,12 @@ public class RegisterPanel extends JPanel {
 
         usernameField = new RoundedTextField(15);
         usernameField.setText("Username");
+        usernameField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                registerUser();
+            }
+        });
         usernameFieldFocus(usernameField);
         styleTextField(usernameField);
         formPanel.add(usernameField, gbc);
@@ -72,6 +78,12 @@ public class RegisterPanel extends JPanel {
 
         passwordField = new RoundedPasswordField(15);
         passwordFieldFocus(passwordField);
+        passwordField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                registerUser();
+            }
+        });
         styleTextField(passwordField);
         formPanel.add(passwordField, gbc);
 
@@ -350,5 +362,6 @@ public class RegisterPanel extends JPanel {
             // No border
         }
     }
+
 }
 

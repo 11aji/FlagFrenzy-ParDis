@@ -57,6 +57,12 @@ public class LoginPanel extends JPanel {
         gbc.gridx = 1;
         usernameField = new RoundedTextField(15);
         usernameField.setText("Username");
+        usernameField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginUser();
+            }
+        });
         usernameFieldFocus(usernameField);
         styleTextField(usernameField);
         formPanel.add(usernameField, gbc);
@@ -66,6 +72,12 @@ public class LoginPanel extends JPanel {
         gbc.gridx = 1;
         passwordField = new RoundedPasswordField(15);
         passwordFieldFocus(passwordField);
+        passwordField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginUser();
+            }
+        });
         styleTextField(passwordField);
         formPanel.add(passwordField, gbc);
 

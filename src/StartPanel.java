@@ -68,7 +68,7 @@ public class StartPanel extends JPanel {
                 g2d.drawString(getText(), x, y);
             }
         };
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 40));
         titleLabel.setForeground(Color.WHITE);
         gbc.gridy = 0;
         gradientPanel.add(titleLabel, gbc);
@@ -143,11 +143,11 @@ public class StartPanel extends JPanel {
                 // Do nothing
             }
         };
-        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setFont(new Font("Arial", Font.BOLD, 20));
         button.setBackground(Color.decode("#2592AF"));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(120, 30));
+        button.setPreferredSize(new Dimension(175, 45));
         button.setOpaque(false);
         button.setBorder(new RoundedBorder(15));
         return button;
