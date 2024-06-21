@@ -20,8 +20,9 @@ public class LoginPanel extends JPanel {
 
         setLayout(new BorderLayout());
 
-        JLabel imageLabel = new JLabel(new ImageIcon("E:\\Flag Frenzy Proj\\Flag Frenzy\\images\\cat.jpg"));
+        JLabel imageLabel = new JLabel(new ImageIcon("images\\123.png"));
         JPanel imagePanel = new JPanel(new BorderLayout());
+        imagePanel.setPreferredSize(new Dimension(350, 436));
         imagePanel.add(imageLabel, BorderLayout.CENTER);
 
         JPanel formPanel = new JPanel() {
@@ -35,9 +36,7 @@ public class LoginPanel extends JPanel {
             }
         };
         formPanel.setBackground(Color.WHITE);
-        Border border = BorderFactory.createLineBorder(Color.BLACK, 2);
-        formPanel.setBorder(border);
-        formPanel.setPreferredSize(new Dimension(400, 360));
+        formPanel.setPreferredSize(new Dimension(350, 436));
         formPanel.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -106,6 +105,12 @@ public class LoginPanel extends JPanel {
                 mainPanel.showStartPanel();
             }
         });
+
+        JPanel combinedPanel = new JPanel(new BorderLayout());
+        combinedPanel.add(imagePanel, BorderLayout.WEST);
+        combinedPanel.add(formPanel, BorderLayout.EAST);
+        combinedPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+
         JPanel gradientPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -128,13 +133,9 @@ public class LoginPanel extends JPanel {
         gbcMain.gridx = 0;
         gbcMain.gridy = 0;
         gbcMain.insets = new Insets(10, 10, 10, 10);
-        gbcMain.anchor = GridBagConstraints.WEST;
+        gbcMain.anchor = GridBagConstraints.CENTER;
 
-        gradientPanel.add(imagePanel, gbcMain);
-
-        gbcMain.gridx = 1;
-        gbcMain.anchor = GridBagConstraints.EAST;
-        gradientPanel.add(formPanel, gbcMain);
+        gradientPanel.add(combinedPanel, gbcMain);
 
         add(gradientPanel, BorderLayout.CENTER);
     }

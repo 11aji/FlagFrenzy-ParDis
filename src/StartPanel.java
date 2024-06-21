@@ -147,7 +147,7 @@ public class StartPanel extends JPanel {
         button.setBackground(Color.decode("#2592AF"));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(175, 45));
+        button.setPreferredSize(new Dimension(150, 38));
         button.setOpaque(false);
         button.setBorder(new RoundedBorder(15));
         return button;

@@ -21,8 +21,9 @@ public class RegisterPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // Create the left panel for the image
-        JLabel imageLabel = new JLabel(new ImageIcon("E:\\Flag Frenzy Proj\\Flag Frenzy\\images\\cat.jpg")); // Using the provided image
+        JLabel imageLabel = new JLabel(new ImageIcon("images\\123.png")); // Using the provided image
         JPanel imagePanel = new JPanel(new BorderLayout());
+        imagePanel.setPreferredSize(new Dimension(350, 436));
         imagePanel.add(imageLabel, BorderLayout.CENTER);
 
         // Create the right panel for the form
@@ -37,9 +38,7 @@ public class RegisterPanel extends JPanel {
             }
         };
         formPanel.setBackground(Color.WHITE);
-        Border border = BorderFactory.createLineBorder(Color.BLACK, 2);  // Add a black line border
-        formPanel.setBorder(border);  // Set the border
-        formPanel.setPreferredSize(new Dimension(400, 360)); // Adjust size as needed
+        formPanel.setPreferredSize(new Dimension(350, 436));
         formPanel.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -78,12 +77,6 @@ public class RegisterPanel extends JPanel {
 
         passwordField = new RoundedPasswordField(15);
         passwordFieldFocus(passwordField);
-        passwordField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                registerUser();
-            }
-        });
         styleTextField(passwordField);
         formPanel.add(passwordField, gbc);
 
@@ -115,6 +108,12 @@ public class RegisterPanel extends JPanel {
             }
         });
 
+        // Create a new panel to combine the imagePanel and formPanel
+        JPanel combinedPanel = new JPanel(new BorderLayout());
+        combinedPanel.add(imagePanel, BorderLayout.WEST);
+        combinedPanel.add(formPanel, BorderLayout.CENTER);
+        combinedPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2)); // Add black outline
+
         // Create a custom panel to paint the gradient background
         JPanel gradientPanel = new JPanel() {
             @Override
@@ -140,13 +139,9 @@ public class RegisterPanel extends JPanel {
         gbcMain.gridx = 0;
         gbcMain.gridy = 0;
         gbcMain.insets = new Insets(10, 10, 10, 10);
-        gbcMain.anchor = GridBagConstraints.WEST;
+        gbcMain.anchor = GridBagConstraints.CENTER;
 
-        gradientPanel.add(imagePanel, gbcMain);
-
-        gbcMain.gridx = 1;
-        gbcMain.anchor = GridBagConstraints.EAST;
-        gradientPanel.add(formPanel, gbcMain);
+        gradientPanel.add(combinedPanel, gbcMain);
 
         // Set the gradient panel as the content pane
         add(gradientPanel, BorderLayout.CENTER);
@@ -362,6 +357,4 @@ public class RegisterPanel extends JPanel {
             // No border
         }
     }
-
 }
-
