@@ -25,8 +25,6 @@ public class GamePanel extends JPanel {
     private MainPanel mainPanel;
     private Timer timer;
     private int timeRemaining;
-    private boolean paused;
-    private List<Flag> incorrectFlags; // List to store incorrect flags
 
     public GamePanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -35,7 +33,6 @@ public class GamePanel extends JPanel {
         flagDatabase = new FlagDatabase();
         score = 0;
         questionsAnswered = 0;
-        incorrectFlags = new ArrayList<>(); // Initialize the list
 
         // Main panel with gradient background
         JPanel mainInnerPanel = new JPanel(new GridBagLayout());
@@ -129,7 +126,6 @@ public class GamePanel extends JPanel {
         this.difficulty = difficulty;
         score = 0;
         questionsAnswered = 0;
-        incorrectFlags.clear(); // Clear incorrect flags list at the start of the game
         scoreLabel.setText("Score: 0/10");
         currentFlags = flagDatabase.getFlags(difficulty);
         loadNextFlag();
@@ -186,9 +182,7 @@ public class GamePanel extends JPanel {
     }
 
     private void checkAnswer(String selectedAnswer) {
-        if (!selectedAnswer.equals(currentFlag.getName())) {
-            incorrectFlags.add(currentFlag); // Add incorrect flag to the list
-        } else {
+        if (selectedAnswer.equals(currentFlag.getName())) {
             score++;
         }
         questionsAnswered++;
@@ -197,7 +191,7 @@ public class GamePanel extends JPanel {
     }
 
     private void showAnalysis() {
-        String analysis = PerformanceAnalyzer.getDetailedFeedback(score, incorrectFlags);
+        String analysis = PerformanceAnalyzer.getDetailedFeedback(score);
         if (difficulty.equals("Easy") && score >= 7) {
             mainPanel.unlockMedium();
         } else if (difficulty.equals("Medium") && score >= 8) {
@@ -293,7 +287,6 @@ public class GamePanel extends JPanel {
                             });
                         } else {
                             timer.stop();
-                            incorrectFlags.add(currentFlag); // Add incorrect flag to the list if time runs out
                             questionsAnswered++;
                             loadNextFlag();
                         }
@@ -332,7 +325,6 @@ public class GamePanel extends JPanel {
                 sourceButton.setBackground(Color.GREEN); // Change button color to green for correct answer
             } else {
                 sourceButton.setBackground(Color.RED); // Change button color to red for incorrect answer
-                incorrectFlags.add(currentFlag); // Add incorrect flag to the list
                 // Highlight the correct answer
                 for (JButton button : choiceButtons) {
                     if (button.getText().equals(currentFlag.getName())) {
@@ -428,4 +420,5 @@ public class GamePanel extends JPanel {
         button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         return button;
     }
+
 }
