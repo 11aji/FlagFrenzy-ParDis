@@ -13,10 +13,12 @@ public class LoginPanel extends JPanel {
     private JButton backButton;
     private UserManager userManager;
     private MainPanel mainPanel;
+    private SoundEffect buttonSound;
 
     public LoginPanel(MainPanel mainPanel, UserManager userManager) {
         this.mainPanel = mainPanel;
         this.userManager = userManager;
+        this.buttonSound = new SoundEffect("src/click.wav");
 
         setLayout(new BorderLayout());
 
@@ -59,6 +61,7 @@ public class LoginPanel extends JPanel {
         usernameField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                buttonSound.play();
                 loginUser();
             }
         });
@@ -74,6 +77,7 @@ public class LoginPanel extends JPanel {
         passwordField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                buttonSound.play();
                 loginUser();
             }
         });
@@ -95,6 +99,7 @@ public class LoginPanel extends JPanel {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                buttonSound.play();
                 loginUser();
             }
         });
@@ -102,6 +107,7 @@ public class LoginPanel extends JPanel {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                buttonSound.play();
                 mainPanel.showStartPanel();
             }
         });

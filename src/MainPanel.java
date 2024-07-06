@@ -8,6 +8,9 @@ public class MainPanel extends JPanel {
     private User currentUser;
     private boolean mediumUnlocked = false;
     private boolean hardUnlocked = false;
+    private GamePanel gamePanel;
+    private SoundEffect mainMusic;
+    private SoundEffect gameplayMusic;
 
     public MainPanel() {
         cardLayout = new CardLayout();
@@ -15,12 +18,14 @@ public class MainPanel extends JPanel {
 
         userManager = new UserManager();
 
+        TitlePanel titlePanel = new TitlePanel(this);
         StartPanel startPanel = new StartPanel(this);
         LoginPanel loginPanel = new LoginPanel(this, userManager);
         RegisterPanel registerPanel = new RegisterPanel(this, userManager);
         DifficultyPanel difficultyPanel = new DifficultyPanel(this);
-        GamePanel gamePanel = new GamePanel(this);
+        gamePanel = new GamePanel(this);
 
+        cardPanel.add(titlePanel, "TITLE");
         cardPanel.add(startPanel, "START");
         cardPanel.add(loginPanel, "LOGIN");
         cardPanel.add(registerPanel, "REGISTER");
@@ -30,24 +35,21 @@ public class MainPanel extends JPanel {
         setLayout(new BorderLayout());
         add(cardPanel, BorderLayout.CENTER);
 
-        cardLayout.show(cardPanel, "START");
-    }
+        cardLayout.show(cardPanel, "TITLE");
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        int width = getWidth();
-        int height = getHeight();
+        // Load background music
+        mainMusic = new SoundEffect("src/main_music.wav");
+        gameplayMusic = new SoundEffect("src/gameplay_music.wav");
 
-        // Create the gradient paint
-        Color startColor = Color.decode("#7AD2EA");
-        Color endColor = Color.decode("#0F597E");
-        GradientPaint gp = new GradientPaint(0, 0, startColor, 0, height, endColor);
+        // Start playing main music when the application starts
+        mainMusic.loop();
 
-        // Paint the background with the gradient
-        g2d.setPaint(gp);
-        g2d.fillRect(0, 0, width, height);
+        // Ensure user progress is saved when the application exits
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (currentUser != null) {
+                userManager.updateUserProgress(currentUser);
+            }
+        }));
     }
 
     public void showStartPanel() {
@@ -59,8 +61,9 @@ public class MainPanel extends JPanel {
     }
 
     public void showGamePanel(String difficulty) {
-        ((GamePanel) cardPanel.getComponent(4)).startGame(difficulty);
+        gamePanel.startGame(difficulty);
         cardLayout.show(cardPanel, "GAME");
+        playGameplayMusic();
     }
 
     public void showLoginPanel() {
@@ -73,6 +76,8 @@ public class MainPanel extends JPanel {
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
+        this.mediumUnlocked = user.isMediumUnlocked();
+        this.hardUnlocked = user.isHardUnlocked();
     }
 
     public User getCurrentUser() {
@@ -81,10 +86,14 @@ public class MainPanel extends JPanel {
 
     public void unlockMedium() {
         mediumUnlocked = true;
+        currentUser.setMediumUnlocked(true);
+        userManager.updateUserProgress(currentUser);
     }
 
     public void unlockHard() {
         hardUnlocked = true;
+        currentUser.setHardUnlocked(true);
+        userManager.updateUserProgress(currentUser);
     }
 
     public boolean isMediumUnlocked() {
@@ -93,5 +102,17 @@ public class MainPanel extends JPanel {
 
     public boolean isHardUnlocked() {
         return hardUnlocked;
+    }
+
+    public void playMainMusic() {
+        gameplayMusic.stop();
+        if (!mainMusic.isPlaying()) {
+            mainMusic.loop();
+        }
+    }
+
+    public void playGameplayMusic() {
+        mainMusic.stop();
+        gameplayMusic.loop();
     }
 }

@@ -9,9 +9,11 @@ public class StartPanel extends JPanel {
     private JButton loginButton;
     private JButton registerButton;
     private JButton exitButton;
+    private SoundEffect buttonSound;
 
     public StartPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
+        this.buttonSound = new SoundEffect("src/click.wav"); // Make sure this file path is correct
 
         setLayout(new BorderLayout());
 
@@ -43,6 +45,11 @@ public class StartPanel extends JPanel {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.NONE;
 
+        // Load and add the image above the title label
+        JLabel imageLabel = new JLabel(new ImageIcon("images/olol.png")); // Update the path accordingly
+        gbc.gridy = 0;
+        gradientPanel.add(imageLabel, gbc);
+
         JLabel titleLabel = new JLabel("Welcome to Flag Frenzy!", SwingConstants.CENTER) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -62,15 +69,13 @@ public class StartPanel extends JPanel {
                 g2d.drawString(getText(), x - 1, y - 1);
                 g2d.drawString(getText(), x + 1, y - 1);
                 g2d.drawString(getText(), x - 1, y + 1);
-
-                // Draw the text
                 g2d.setColor(getForeground());
                 g2d.drawString(getText(), x, y);
             }
         };
         titleLabel.setFont(new Font("Arial", Font.BOLD, 40));
         titleLabel.setForeground(Color.WHITE);
-        gbc.gridy = 0;
+        gbc.gridy++;
         gradientPanel.add(titleLabel, gbc);
 
         gbc.gridy++;
@@ -91,6 +96,7 @@ public class StartPanel extends JPanel {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                buttonSound.play();
                 mainPanel.showLoginPanel();
             }
         });
@@ -98,12 +104,14 @@ public class StartPanel extends JPanel {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                buttonSound.play();
                 mainPanel.showRegisterPanel();
             }
         });
 
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                buttonSound.play();
                 int option = JOptionPane.showConfirmDialog(mainPanel, "Are you sure you want to exit?", "Confirm Exit", JOptionPane.YES_NO_OPTION);
                 if (option == JOptionPane.YES_OPTION) {
                     System.exit(0);

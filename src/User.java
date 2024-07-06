@@ -2,13 +2,17 @@ import java.io.Serializable;
 
 public class User implements Serializable {
     private String username;
-    private String password; // Add password field
+    private String password;
     private int highScore;
+    private boolean mediumUnlocked;
+    private boolean hardUnlocked;
 
-    public User(String username, String password) { // Update constructor
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.highScore = 0;
+        this.mediumUnlocked = false;
+        this.hardUnlocked = false;
     }
 
     public String getUsername() {
@@ -16,7 +20,7 @@ public class User implements Serializable {
     }
 
     public String getPassword() {
-        return password; // Add getter for password
+        return password;
     }
 
     public int getHighScore() {
@@ -26,5 +30,20 @@ public class User implements Serializable {
     public void setHighScore(int highScore) {
         this.highScore = highScore;
     }
-}
 
+    public boolean isMediumUnlocked() {
+        return mediumUnlocked;
+    }
+
+    public void setMediumUnlocked(boolean mediumUnlocked) {
+        this.mediumUnlocked = mediumUnlocked;
+    }
+
+    public boolean isHardUnlocked() {
+        return hardUnlocked;
+    }
+
+    public void setHardUnlocked(boolean hardUnlocked) {
+        this.hardUnlocked = hardUnlocked;
+    }
+}

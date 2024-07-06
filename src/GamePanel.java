@@ -1,7 +1,13 @@
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GamePanel extends JPanel {
@@ -19,6 +25,8 @@ public class GamePanel extends JPanel {
     private MainPanel mainPanel;
     private Timer timer;
     private int timeRemaining;
+    private boolean paused;
+    private List<Flag> incorrectFlags; // List to store incorrect flags
 
     public GamePanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -27,6 +35,7 @@ public class GamePanel extends JPanel {
         flagDatabase = new FlagDatabase();
         score = 0;
         questionsAnswered = 0;
+        incorrectFlags = new ArrayList<>(); // Initialize the list
 
         // Main panel with gradient background
         JPanel mainInnerPanel = new JPanel(new GridBagLayout());
@@ -84,7 +93,6 @@ public class GamePanel extends JPanel {
         timerScorePanel.add(timerLabel, BorderLayout.WEST);
         timerScorePanel.add(scoreLabel, BorderLayout.EAST);
 
-
         innerPanel.add(timerScorePanel, BorderLayout.NORTH);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -94,8 +102,27 @@ public class GamePanel extends JPanel {
         mainInnerPanel.add(innerPanel, gbc);
 
         add(mainInnerPanel, BorderLayout.CENTER);
-    }
 
+        // Add the "Go Back" label
+        JLabel goBackLabel = new JLabel("< Go Back");
+        goBackLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        goBackLabel.setForeground(Color.white); // Set to the same blue color as the buttons
+        goBackLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        goBackLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                mainPanel.showDifficultyPanel();
+                mainPanel.playMainMusic();  // Play main music when going back
+            }
+        });
+
+        // Position "Go Back" label
+        GridBagConstraints backGbc = new GridBagConstraints();
+        backGbc.gridx = 0;
+        backGbc.gridy = 1;
+        backGbc.anchor = GridBagConstraints.WEST;
+        backGbc.insets = new Insets(10, 10, 10, 10); // Add some padding
+        mainInnerPanel.add(goBackLabel, backGbc);
+    }
 
     private boolean analysisShown = false;
 
@@ -103,6 +130,7 @@ public class GamePanel extends JPanel {
         this.difficulty = difficulty;
         score = 0;
         questionsAnswered = 0;
+        incorrectFlags.clear(); // Clear incorrect flags list at the start of the game
         scoreLabel.setText("Score: 0/10");
         currentFlags = flagDatabase.getFlags(difficulty);
         loadNextFlag();
@@ -143,56 +171,103 @@ public class GamePanel extends JPanel {
         int correctIndex = (int) (Math.random() * 4);
         choiceButtons[correctIndex].setText(currentFlag.getName());
 
+        // Create a list of incorrect flag names
+        List<Flag> incorrectFlags = new ArrayList<>(currentFlags);
+        incorrectFlags.remove(currentFlag);
+
+        // Ensure the incorrect flags are unique and not already guessed
+        Collections.shuffle(incorrectFlags);
+        int incorrectFlagIndex = 0;
         for (int i = 0; i < 4; i++) {
             if (i != correctIndex) {
-                int randomIndex;
-                do {
-                    randomIndex = (int) (Math.random() * currentFlags.size());
-                } while (currentFlags.get(randomIndex).equals(currentFlag));
-                choiceButtons[i].setText(currentFlags.get(randomIndex).getName());
+                choiceButtons[i].setText(incorrectFlags.get(incorrectFlagIndex).getName());
+                incorrectFlagIndex++;
             }
         }
     }
 
     private void checkAnswer(String selectedAnswer) {
-        if (selectedAnswer.equals(currentFlag.getName())) {
+        if (!selectedAnswer.equals(currentFlag.getName())) {
+            incorrectFlags.add(currentFlag); // Add incorrect flag to the list
+        } else {
             score++;
         }
         questionsAnswered++;
-        scoreLabel.setText("Score: " + score+"/10");
+        scoreLabel.setText("Score: " + score + "/10");
         loadNextFlag();
     }
 
     private void showAnalysis() {
-        String analysis = PerformanceAnalyzer.getDetailedFeedback(score);
+        String analysis = PerformanceAnalyzer.getDetailedFeedback(score, incorrectFlags);
         if (difficulty.equals("Easy") && score >= 7) {
             mainPanel.unlockMedium();
-        }
-        else if (difficulty.equals("Medium") && score >= 8) {
+        } else if (difficulty.equals("Medium") && score >= 8) {
             mainPanel.unlockHard();
         }
 
         SwingUtilities.invokeLater(() -> {
-            JDialog analysisDialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Performance Analysis", true);
-            analysisDialog.setSize(400, 300);
-            analysisDialog.setLayout(new BorderLayout());
+            JFrame analysisFrame = new JFrame("Performance Analysis");
+            analysisFrame.setSize(500, 400);
+            analysisFrame.setLayout(new BorderLayout());
 
+            JPanel contentPanel = new JPanel(new BorderLayout()) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    Graphics2D g2d = (Graphics2D) g;
+                    int width = getWidth();
+                    int height = getHeight();
+                    Color color1 = Color.decode("#7AD2EA");
+                    Color color2 = Color.decode("#0F597E");
+                    GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
+                    g2d.setPaint(gp);
+                    g2d.fillRect(0, 0, width, height);
+                }
+            };
+            contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            contentPanel.setOpaque(false); // Ensure the gradient is visible
+
+            JPanel textPanel = new JPanel(new BorderLayout());
+            textPanel.setBackground(Color.WHITE);
+            textPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
             JTextArea analysisTextArea = new JTextArea(analysis);
             analysisTextArea.setWrapStyleWord(true);
             analysisTextArea.setLineWrap(true);
             analysisTextArea.setEditable(false);
+            analysisTextArea.setFont(new Font("Arial", Font.BOLD, 19)); // Bold text
+            textPanel.add(new JScrollPane(analysisTextArea), BorderLayout.CENTER);
 
-            JScrollPane scrollPane = new JScrollPane(analysisTextArea);
-            analysisDialog.add(scrollPane, BorderLayout.CENTER);
+            contentPanel.add(textPanel, BorderLayout.CENTER);
 
-            JButton closeButton = new JButton("Close");
+            JButton closeButton = createRoundedButton("Close");
             closeButton.addActionListener(e -> {
-                analysisDialog.dispose();
+                analysisFrame.dispose();
                 mainPanel.showDifficultyPanel();
+                mainPanel.playMainMusic();  // Play main music when closing analysis
             });
-            analysisDialog.add(closeButton, BorderLayout.SOUTH);
 
-            analysisDialog.setVisible(true);
+            JPanel buttonPanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    Graphics2D g2d = (Graphics2D) g;
+                    int width = getWidth();
+                    int height = getHeight();
+                    Color color1 = Color.decode("#7AD2EA");
+                    Color color2 = Color.decode("#0F597E");
+                    GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
+                    g2d.setPaint(gp);
+                    g2d.fillRect(0, 0, width, height);
+                }
+            };
+            buttonPanel.setOpaque(false); // Transparent background
+            buttonPanel.add(closeButton);
+
+            analysisFrame.add(contentPanel, BorderLayout.CENTER);
+            analysisFrame.add(buttonPanel, BorderLayout.SOUTH);
+
+            analysisFrame.setLocationRelativeTo(this);
+            analysisFrame.setVisible(true);
         });
     }
 
@@ -220,6 +295,7 @@ public class GamePanel extends JPanel {
                             });
                         } else {
                             timer.stop();
+                            incorrectFlags.add(currentFlag); // Add incorrect flag to the list if time runs out
                             questionsAnswered++;
                             loadNextFlag();
                         }
@@ -232,7 +308,6 @@ public class GamePanel extends JPanel {
         // Start the timer thread
         timerThread.start();
     }
-
 
     private class ChoiceButtonListener implements ActionListener {
         @Override
@@ -259,15 +334,31 @@ public class GamePanel extends JPanel {
                 sourceButton.setBackground(Color.GREEN); // Change button color to green for correct answer
             } else {
                 sourceButton.setBackground(Color.RED); // Change button color to red for incorrect answer
-                Timer colorTimer = new Timer(1000, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        sourceButton.setBackground(Color.decode("#2592AF")); // Reset button color after 1 second
+                incorrectFlags.add(currentFlag); // Add incorrect flag to the list
+                // Highlight the correct answer
+                for (JButton button : choiceButtons) {
+                    if (button.getText().equals(currentFlag.getName())) {
+                        button.setBackground(Color.GREEN);
+                        break;
                     }
-                });
-                colorTimer.setRepeats(false);
-                colorTimer.start();
+                }
             }
+
+            // Delayed reset of button color
+            Timer colorTimer = new Timer(1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    sourceButton.setBackground(Color.decode("#2592AF")); // Reset button color after 1 second
+                    for (JButton button : choiceButtons) {
+                        if (button.getBackground() == Color.GREEN) {
+                            button.setBackground(Color.decode("#2592AF")); // Reset correct answer button color
+                        }
+                    }
+                }
+            });
+            colorTimer.setRepeats(false);
+            colorTimer.start();
+
             checkAnswer(selectedAnswer); // Proceed to check the answer
 
             // Enable choice buttons after checking answer
@@ -283,8 +374,6 @@ public class GamePanel extends JPanel {
         }
     }
 
-
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -296,5 +385,49 @@ public class GamePanel extends JPanel {
         GradientPaint gp = new GradientPaint(0, 0, color1, 0, height, color2);
         g2d.setPaint(gp);
         g2d.fillRect(0, 0, width, height);
+    }
+
+    private JButton createRoundedButton(String text) {
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Paint the rounded background
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+
+                // Paint the text
+                g2.setColor(getForeground());
+                g2.setFont(getFont());
+                FontMetrics fm = g2.getFontMetrics();
+                int stringWidth = fm.stringWidth(getText());
+                int stringHeight = fm.getAscent();
+                g2.drawString(getText(), (getWidth() - stringWidth) / 2, (getHeight() + stringHeight) / 2 - 2);
+
+                g2.dispose();
+            }
+
+            @Override
+            protected void paintBorder(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Paint the border
+                g2.setColor(Color.BLACK);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+
+                g2.dispose();
+            }
+        };
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(false);
+        button.setOpaque(false);
+        button.setBackground(Color.decode("#2592AF"));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Arial", Font.BOLD, 24));
+        button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        return button;
     }
 }

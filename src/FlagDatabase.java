@@ -64,7 +64,7 @@ public class FlagDatabase {
         mediumFlags.add(new Flag("Iran", "images\\medium\\ir.png"));
         mediumFlags.add(new Flag("Macao", "images\\medium\\mo.png"));
         mediumFlags.add(new Flag("Cambodia", "images\\medium\\kh.png"));
-        mediumFlags.add(new Flag("Peurto Rico", "images\\medium\\pr.png"));
+        mediumFlags.add(new Flag("Puerto Rico", "images\\medium\\pr.png"));
         mediumFlags.add(new Flag("Nigeria", "images\\medium\\ng.png"));
         mediumFlags.add(new Flag("Bangladesh", "images\\medium\\bd.png"));
         mediumFlags.add(new Flag("Tanzania", "images\\medium\\tz.png"));
@@ -79,7 +79,7 @@ public class FlagDatabase {
         mediumFlags.add(new Flag("Yemen", "images\\medium\\ye.png"));
         mediumFlags.add(new Flag("Peru", "images\\medium\\pe.png"));
         mediumFlags.add(new Flag("Madagascar", "images\\medium\\mg.png"));
-        mediumFlags.add(new Flag("Velenzuela", "images\\medium\\ve.png"));
+        mediumFlags.add(new Flag("Venezuela", "images\\medium\\ve.png"));
         mediumFlags.add(new Flag("Niger", "images\\medium\\ne.png"));
         mediumFlags.add(new Flag("Mali", "images\\medium\\ml.png"));
         mediumFlags.add(new Flag("Syria", "images\\medium\\sy.png"));
